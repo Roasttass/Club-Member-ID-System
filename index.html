@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Club Member Identification System</title>
+<style>
+  /* Reset and base styles */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: #4a90e2;
+    color: white;
+    padding: 1rem 1.5rem;
+    text-align: center;
+  }
+  h1 {
+    margin: 0;
+    font-weight: normal;
+  }
+  main {
+    flex-grow: 1;
+    padding: 1rem 1.5rem;
+    max-width: 800px;
+    margin: 0 auto 2rem auto;
+    width: 100%;
+  }
+  /* Login form */
+  #login-form {
+    max-width: 320px;
+    margin: 4rem auto 0 auto;
+    background: white;
+    padding: 2rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  #login-form h2 {
+    margin-bottom: 1.5rem;
+    color: #4a90e2;
+    text-align: center;
+  }
+  #login-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  #login-form input[type="text"],
+  #login-form input[type="password"] {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    font-size: 1rem;
+  }
+  #login-form button {
+    width: 100%;
+    background: #4a90e2;
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 0.75rem 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.3s ease;
+  }
+  #login-form button:hover {
+    background: #357abd;
+  }
+  #login-error {
+    color: red;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  /* Registration form */
+  #register-form {
+    max-width: 320px;
+    margin: 4rem auto 0 auto;
+    background: white;
+    padding: 2rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+  #register-form h2 {
+    margin-bottom: 1.5rem;
+    color: #4a90e2;
+    text-align: center;
+  }
+  #register-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  #register-form input[type="text"],
+  #register-form input[type="password"] {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    font-size: 1rem;
+  }
+  #register-form button {
+    width: 100%;
+    background: #4a90e2;
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 0.75rem 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.3s ease;
+  }
+  #register-form button:hover {
+    background: #357abd;
+  }
+  #register-error {
+    color: red;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  /* Dashboard */
+  #dashboard {
+    display: none;
+  }
+  #dashboard h2 {
+    margin-top: 0;
+    color: #333;
+  }
+  #welcome-msg {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  #logout-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    float: right;
+    transition: background 0.3s ease;
+  }
+  #logout-btn:hover {
+    background: #c0392b;
+  }
+  /* Member list table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+  th {
+    background: #4a90e2;
+    color: white;
+  }
+  tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  /* Editable cells for admin */
+  td.editable {
+    background: #fff3e0;
+    cursor: pointer;
+    position: relative;
+  }
+  td.editable:hover {
+    background: #ffe0b2;
+  }
+  input.edit-input {
+    width: 80px;
+    padding: 0.25rem;
+    font-size: 1rem;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+  }
+  /* Delete button */
+  .delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .delete-btn:hover {
+    background: #c0392b;
+  }
+  /* Top 10 Members Section */
+  #top-members-section {
+    margin-top: 2rem;
+  }
+
+  #top-members-section table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #top-members-section th, #top-members-section td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+  }
+
+  #top-members-section th {
+    background: #4a90e2;
+    color: white;
+  }
+
+  #top-members-section tr:nth-child(even) {
+    background: #f9f9f9;
+  }
+  /* Profile Section */
+  #profile-section {
+    margin-top: 2rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  #profile-section img {
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  #profile-section textarea {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+
+  #profile-section button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    transition: background 0.3s ease;
+  }
+
+  #profile-section button:hover {
+    background: #357abd;
+  }
+  /* Chat Section */
+  #chat-section {
+    margin-top: 2rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  #chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  #chat-messages div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  #chat-messages img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 1rem;
+  }
+
+  #chat-messages p {
+    margin: 0;
+  }
+
+  #chat-input {
+    width: 80%;
+    padding: 0.5rem;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    margin-right: 0.5rem;
+  }
+
+  #send-chat-btn {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  #send-chat-btn:hover {
+    background: #357abd;
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
+    #login-form {
+      width: 90%;
+      margin-top: 2rem;
+      padding: 1.5rem;
+    }
+    #register-form {
+      width: 90%;
+      margin-top: 2rem;
+      padding: 1.5rem;
+    }
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+    thead tr {
+      display: none;
+    }
+    tr {
+      margin-bottom: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      padding: 1rem;
+    }
+    td {
+      border: none;
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 50%;
+      text-align: right;
+    }
+    td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 600;
+      text-align: left;
+      width: 45%;
+      color: #666;
+    }
+    #logout-btn {
+      float: none;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+
+  table[aria-describedby="members-desc"] {
+    display: none; /* Default hidden */
+  }
+
+  #bio-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: 300px;
+  }
+
+  #bio-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+
+  #bio-modal h3 {
+    margin-top: 0;
+  }
+
+  #bio-modal button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #bio-modal button:hover {
+    background: #357abd;
+  }
+
+  #member-question-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: 300px;
+  }
+
+  #member-question-popup h3 {
+    margin: 0;
+    text-align: center;
+  }
+
+  #member-question-popup button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #answer-yes-btn {
+    background: #4caf50;
+    color: white;
+  }
+
+  #answer-no-btn {
+    background: #f44336;
+    color: white;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Club Member Identification System</h1>
+</header>
+<main>
+  <!-- Login form -->
+  <div id="login-form">
+    <h2>Login</h2>
+    <div id="login-error" role="alert" aria-live="assertive"></div>
+    <label for="username-input">Username</label>
+    <input type="text" id="username-input" autocomplete="username" placeholder="Enter username" />
+    <label for="password-input">Password</label>
+    <input type="password" id="password-input" autocomplete="current-password" placeholder="Enter password" />
+    <button id="login-btn" type="button">Login</button>
+    <p>
+      Don't have an account? <a href="#" id="show-register-link">Register here</a>
+    </p>
+  </div>
+
+  <!-- Registration form -->
+  <div id="register-form" style="display: none;">
+    <h2>Register</h2>
+    <div id="register-error" role="alert" aria-live="assertive"></div>
+    <label for="register-name-input">Full Name</label>
+    <input type="text" id="register-name-input" placeholder="Enter full name" />
+    <label for="register-username-input">Username</label>
+    <input type="text" id="register-username-input" placeholder="Enter username" />
+    <label for="register-password-input">Password</label>
+    <input type="password" id="register-password-input" placeholder="Enter password" />
+    <button id="register-btn" type="button">Register</button>
+    <p>
+      Already have an account? <a href="#" id="show-login-link">Login here</a>
+    </p>
+  </div>
+
+  <!-- Dashboard -->
+  <section id="dashboard" aria-live="polite" aria-atomic="true">
+    <button id="logout-btn" aria-label="Logout">Logout</button>
+    <h2>Members</h2>
+    <p id="welcome-msg"></p>
+    <table role="table" aria-describedby="members-desc">
+      <caption id="members-desc">List of club members with their points and rankings</caption>
+      <thead>
+        <tr>
+          <th scope="col">Profile Picture</th>
+          <th scope="col">Member Name</th>
+          <th scope="col">Username</th>
+          <th scope="col">Password</th>
+          <th scope="col">Ranking</th>
+          <th scope="col">Points</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="members-table-body">
+        <!-- Members rows generated dynamically -->
+      </tbody>
+    </table>
+    <p><em>Admin can click ranking and points cells to edit them.</em></p>
+  </section>
+
+  <!-- Top 10 Members Section -->
+  <section id="top-members-section" style="display: none;">
+    <h3>Top 10 Members</h3>
+    <table role="table" aria-describedby="top-members-desc">
+      <caption id="top-members-desc">Top 10 members by points</caption>
+      <thead>
+        <tr>
+          <th scope="col">Rank</th>
+          <th scope="col">Member Name</th>
+          <th scope="col">Points</th>
+          <th scope="col">Ranking</th>
+        </tr>
+      </thead>
+      <tbody id="top-members-table-body">
+        <!-- Top 10 members rows generated dynamically -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Profile Section -->
+  <section id="profile-section" style="display: none;">
+    <h3>My Profile</h3>
+    <div>
+      <img id="profile-picture" src="default-profile.png" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
+      <input type="file" id="profile-picture-input" accept="image/*" />
+    </div>
+    <div>
+      <label for="bio-input">Bio:</label>
+      <textarea id="bio-input" rows="4" placeholder="Write something about yourself..."></textarea>
+    </div>
+    <button id="save-profile-btn">Save Profile</button>
+  </section>
+
+  <!-- Chat Section -->
+  <section id="chat-section" style="display: none;">
+    <h3>Chat</h3>
+    <div id="chat-messages" style="height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 1rem; background: #f9f9f9; border-radius: 8px; margin-bottom: 1rem;">
+      <!-- Chat messages will be displayed here -->
+    </div>
+    <div>
+      <input type="text" id="chat-input" placeholder="Type your message..." style="width: 80%; padding: 0.5rem; border: 1px solid #bbb; border-radius: 6px;" />
+      <button id="send-chat-btn" style="padding: 0.5rem 1rem; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer;">Send</button>
+    </div>
+  </section>
+
+  <!-- Admin Question Submission -->
+  <section id="admin-question-section" style="display: none; margin-top: 2rem;">
+    <h3>Submit a Question</h3>
+    <textarea id="admin-question-input" rows="3" placeholder="Enter your question here..." style="width: 100%; padding: 0.5rem; margin-bottom: 1rem; border: 1px solid #bbb; border-radius: 6px;"></textarea>
+    <button id="submit-question-btn" style="padding: 0.5rem 1rem; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer;">Submit Question</button>
+  </section>
+
+  <!-- Admin Results Section -->
+  <section id="admin-results-section" style="display: none; margin-top: 2rem;">
+    <h3>Question Results</h3>
+    <p id="results-question-text">No question submitted yet.</p>
+    <p><strong>Yes:</strong> <span id="results-yes-count">0</span></p>
+    <ul id="results-yes-list"></ul>
+    <p><strong>No:</strong> <span id="results-no-count">0</span></p>
+    <ul id="results-no-list"></ul>
+  </section>
+
+  <!-- Bio Modal -->
+  <div id="bio-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); z-index: 1000; width: 300px;">
+    <h3 id="bio-modal-name"></h3>
+    <p id="bio-modal-bio"></p>
+    <button id="close-bio-modal" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+  </div>
+  <div id="bio-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999;"></div>
+
+  <!-- Member Question Popup -->
+  <div id="member-question-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); z-index: 1000; width: 300px;">
+    <h3 id="popup-question-text"></h3>
+    <div style="margin-top: 1rem; text-align: center;">
+      <button id="answer-yes-btn" style="padding: 0.5rem 1rem; background: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; margin-right: 1rem;">Yes</button>
+      <button id="answer-no-btn" style="padding: 0.5rem 1rem; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer;">No</button>
+    </div>
+  </div>
+</main>
+
+<script>
+(() => {
+  // Sample initial data (would come from server in real app)
+  const initialUsers = [
+    {username: 'admin', password: 'adminpass', name: 'Administrator', role: 'admin', points: 0, ranking: 'N/A', profilePicture: 'default-profile.png', bio: ''},
+    {username: 'john', password: 'john123', name: 'John Doe', role: 'member', points: 150, ranking: 'Silver', profilePicture: 'default-profile.png', bio: ''},
+    {username: 'jane', password: 'jane321', name: 'Jane Smith', role: 'member', points: 230, ranking: 'Gold', profilePicture: 'default-profile.png', bio: ''},
+    {username: 'alice', password: 'alicepw', name: 'Alice Johnson', role: 'member', points: 95, ranking: 'Bronze', profilePicture: 'default-profile.png', bio: ''},
+  ];
+
+  // Local storage keys
+  const USERS_STORAGE_KEY = 'club_users';
+  const SESSION_STORAGE_KEY = 'club_session';
+  const CHAT_STORAGE_KEY = 'club_chat_messages';
+  const QUESTION_STORAGE_KEY = 'current_question';
+  const RESPONSES_STORAGE_KEY = 'question_responses';
+
+  // DOM elements
+  const loginFormEl = document.getElementById('login-form');
+  const registerFormEl = document.getElementById('register-form');
+  const dashboardEl = document.getElementById('dashboard');
+  const loginBtn = document.getElementById('login-btn');
+  const registerBtn = document.getElementById('register-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const loginErrorEl = document.getElementById('login-error');
+  const registerErrorEl = document.getElementById('register-error');
+  const usernameInput = document.getElementById('username-input');
+  const passwordInput = document.getElementById('password-input');
+  const registerNameInput = document.getElementById('register-name-input');
+  const registerUsernameInput = document.getElementById('register-username-input');
+  const registerPasswordInput = document.getElementById('register-password-input');
+  const membersTableBody = document.getElementById('members-table-body');
+  const welcomeMsg = document.getElementById('welcome-msg');
+  const showRegisterLink = document.getElementById('show-register-link');
+  const showLoginLink = document.getElementById('show-login-link');
+
+  // DOM elements for profile
+  const profileSection = document.getElementById('profile-section');
+  const profilePictureEl = document.getElementById('profile-picture');
+  const profilePictureInput = document.getElementById('profile-picture-input');
+  const bioInput = document.getElementById('bio-input');
+  const saveProfileBtn = document.getElementById('save-profile-btn');
+
+  // DOM elements for chat
+  const chatSection = document.getElementById('chat-section');
+  const chatMessagesEl = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+  const sendChatBtn = document.getElementById('send-chat-btn');
+
+  // DOM elements for bio modal
+  const bioModal = document.getElementById('bio-modal');
+  const bioModalOverlay = document.getElementById('bio-modal-overlay');
+  const bioModalName = document.getElementById('bio-modal-name');
+  const bioModalBio = document.getElementById('bio-modal-bio');
+  const closeBioModalBtn = document.getElementById('close-bio-modal');
+
+  // DOM elements for admin question submission
+  const adminQuestionSection = document.getElementById('admin-question-section');
+  const adminQuestionInput = document.getElementById('admin-question-input');
+  const submitQuestionBtn = document.getElementById('submit-question-btn');
+
+  // DOM elements for admin results section
+  const adminResultsSection = document.getElementById('admin-results-section');
+  const resultsQuestionText = document.getElementById('results-question-text');
+  const resultsYesCount = document.getElementById('results-yes-count');
+  const resultsYesList = document.getElementById('results-yes-list');
+  const resultsNoCount = document.getElementById('results-no-count');
+  const resultsNoList = document.getElementById('results-no-list');
+
+  // DOM elements for member question popup
+  const memberQuestionPopup = document.getElementById('member-question-popup');
+  const popupQuestionText = document.getElementById('popup-question-text');
+  const answerYesBtn = document.getElementById('answer-yes-btn');
+  const answerNoBtn = document.getElementById('answer-no-btn');
+
+  // Utilities
+  function saveUsers(users) {
+    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+  }
+  function getUsers() {
+    let users = localStorage.getItem(USERS_STORAGE_KEY);
+    return users ? JSON.parse(users) : null;
+  }
+  function saveSession(username) {
+    sessionStorage.setItem(SESSION_STORAGE_KEY, username);
+  }
+  function clearSession() {
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
+  }
+  function getSession() {
+    return sessionStorage.getItem(SESSION_STORAGE_KEY);
+  }
+
+  // Load chat messages from localStorage
+  function loadChatMessages() {
+    const messages = localStorage.getItem(CHAT_STORAGE_KEY);
+    return messages ? JSON.parse(messages) : [];
+  }
+
+  // Save chat messages to localStorage
+  function saveChatMessages(messages) {
+    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+  }
+
+  // Find user by name
+  function findUserByName(name) {
+    const users = getUsers();
+    return users ? users.find(u => u.name === name) : null;
+  }
+
+  // Render chat messages
+  function renderChatMessages() {
+    const messages = loadChatMessages();
+    chatMessagesEl.innerHTML = messages
+      .map(msg => {
+        const user = findUserByName(msg.user); // Find the user by name
+        const profilePicture = user?.profilePicture || 'default-profile.png';
+        return `
+          <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <img 
+              src="${profilePicture}" 
+              alt="${msg.user}'s Profile Picture" 
+              style="width: 40px; height: 40px; border-radius: 50%; cursor: pointer; margin-right: 1rem;" 
+              data-username="${user?.username}" 
+            />
+            <p style="margin: 0;"><strong>${msg.user}:</strong> ${msg.text}</p>
+          </div>
+        `;
+      })
+      .join('');
+
+    // Add event listeners to profile pictures
+    const profilePictures = chatMessagesEl.querySelectorAll('img[data-username]');
+    profilePictures.forEach(img => {
+      img.addEventListener('click', () => {
+        const username = img.getAttribute('data-username');
+        const user = findUser(username);
+        if (user) {
+          showBioModal(user);
+        }
+      });
+    });
+
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight; // Scroll to the bottom
+  }
+
+  // Send a chat message
+  function sendChatMessage(user) {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    const messages = loadChatMessages();
+    messages.push({ user: user.name, text }); // Include the user's name
+    saveChatMessages(messages);
+
+    chatInput.value = '';
+    renderChatMessages();
+  }
+
+  // Event listener for sending chat messages
+  sendChatBtn.addEventListener('click', () => {
+    const currentUser = findUser(getSession());
+    if (currentUser) {
+      sendChatMessage(currentUser);
+    }
+  });
+
+  // Allow pressing Enter to send chat messages
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const currentUser = findUser(getSession());
+      if (currentUser) {
+        sendChatMessage(currentUser);
+      }
+    }
+  });
+
+  // Initialize users if not exist
+  function initializeUsers() {
+    if (!getUsers()) {
+      saveUsers(initialUsers);
+    }
+  }
+
+  // Find user by username
+  function findUser(username) {
+    const users = getUsers();
+    return users ? users.find(u => u.username === username) : null;
+  }
+
+  // Update user data (for points/ranking edits)
+  function updateUser(updatedUser) {
+    const users = getUsers();
+    if (!users) return false;
+    const index = users.findIndex(u => u.username === updatedUser.username);
+    if (index !== -1) {
+      users[index] = {...updatedUser};
+      saveUsers(users);
+      return true;
+    }
+    return false;
+  }
+
+  // Render members table
+  function renderMembersTable(currentUser) {
+    const users = getUsers() || [];
+    membersTableBody.innerHTML = '';
+
+    users.forEach(user => {
+      // If the current user is a member, only show their own row
+      if (currentUser.role === 'member' && user.username !== currentUser.username) {
+        return;
+      }
+
+      const tr = document.createElement('tr');
+
+      // Profile picture cell
+      const profilePictureTd = document.createElement('td');
+      const profilePictureImg = document.createElement('img');
+      profilePictureImg.src = user.profilePicture || 'default-profile.png';
+      profilePictureImg.alt = `${user.name}'s Profile Picture`;
+      profilePictureImg.style.width = '50px';
+      profilePictureImg.style.height = '50px';
+      profilePictureImg.style.borderRadius = '50%';
+      profilePictureImg.style.cursor = 'pointer';
+      profilePictureImg.addEventListener('click', () => showBioModal(user));
+      profilePictureTd.appendChild(profilePictureImg);
+      tr.appendChild(profilePictureTd);
+
+      // Member name cell
+      const nameTd = document.createElement('td');
+      nameTd.textContent = user.name;
+      nameTd.setAttribute('data-label', 'Member Name');
+      tr.appendChild(nameTd);
+
+      // Username cell
+      const usernameTd = document.createElement('td');
+      usernameTd.textContent = user.username;
+      usernameTd.setAttribute('data-label', 'Username');
+      tr.appendChild(usernameTd);
+
+      // Password cell (only visible to admin)
+      const passwordTd = document.createElement('td');
+      passwordTd.textContent = currentUser.role === 'admin' ? user.password : '******';
+      passwordTd.setAttribute('data-label', 'Password');
+      tr.appendChild(passwordTd);
+
+      // Ranking cell (editable for admin)
+      const rankingTd = document.createElement('td');
+      rankingTd.textContent = user.ranking || '';
+      rankingTd.setAttribute('data-label', 'Ranking');
+      if (currentUser.role === 'admin' && user.username !== 'admin') {
+        rankingTd.classList.add('editable');
+        rankingTd.title = 'Click to edit Ranking';
+        rankingTd.tabIndex = 0;
+        rankingTd.addEventListener('click', () => makeEditable(rankingTd, user, 'ranking'));
+        rankingTd.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            makeEditable(rankingTd, user, 'ranking');
+          }
+        });
+      }
+      tr.appendChild(rankingTd);
+
+      // Points cell (editable for admin)
+      const pointsTd = document.createElement('td');
+      pointsTd.textContent = user.points != null ? user.points : '';
+      pointsTd.setAttribute('data-label', 'Points');
+      if (currentUser.role === 'admin' && user.username !== 'admin') {
+        pointsTd.classList.add('editable');
+        pointsTd.title = 'Click to edit Points';
+        pointsTd.tabIndex = 0;
+        pointsTd.addEventListener('click', () => makeEditable(pointsTd, user, 'points'));
+        pointsTd.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            makeEditable(pointsTd, user, 'points');
+          }
+        });
+      }
+      tr.appendChild(pointsTd);
+
+      // Actions cell (only for admin)
+      const actionsTd = document.createElement('td');
+      if (currentUser.role === 'admin' && user.username !== 'admin') {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.addEventListener('click', () => deleteMember(user.username));
+        actionsTd.appendChild(deleteBtn);
+      }
+      tr.appendChild(actionsTd);
+
+      membersTableBody.appendChild(tr);
+    });
+  }
+
+  // Make a cell editable for admin
+  function makeEditable(td, user, field) {
+    if (td.querySelector('input')) return; // already editing
+
+    const oldValue = td.textContent;
+    td.textContent = '';
+
+    const input = document.createElement('input');
+    input.type = (field === 'points') ? 'number' : 'text';
+    input.value = oldValue;
+    input.className = 'edit-input';
+    input.setAttribute('aria-label', `Edit ${field} for ${user.name}`);
+
+    td.appendChild(input);
+    input.focus();
+
+    function saveChange() {
+      const newValue = input.value.trim();
+      if (field === 'points') {
+        // Validate points: must be a non-negative integer
+        if (!/^\d+$/.test(newValue)) {
+          alert('Points must be a non-negative whole number');
+          input.focus();
+          return;
+        }
+        user.points = parseInt(newValue, 10);
+      } else {
+        // For ranking just set as string, max length 20 chars
+        if (newValue.length > 20) {
+          alert('Ranking must be 20 characters or less');
+          input.focus();
+          return;
+        }
+        user.ranking = newValue;
+      }
+      updateUser(user);
+      td.textContent = (field === 'points') ? user.points : user.ranking;
+      input.removeEventListener('blur', onBlur);
+      input.removeEventListener('keydown', onKeyDown);
+    }
+    function cancelChange() {
+      td.textContent = oldValue;
+      input.removeEventListener('blur', onBlur);
+      input.removeEventListener('keydown', onKeyDown);
+    }
+    function onBlur() {
+      saveChange();
+    }
+    function onKeyDown(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveChange();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        cancelChange();
+      }
+    }
+    input.addEventListener('blur', onBlur);
+    input.addEventListener('keydown', onKeyDown);
+  }
+
+  // Delete member (admin only)
+  function deleteMember(username) {
+    if (!confirm(`Are you sure you want to delete the account for ${username}?`)) {
+      return;
+    }
+
+    const users = getUsers();
+    const updatedUsers = users.filter(user => user.username !== username);
+    saveUsers(updatedUsers);
+
+    alert(`Member ${username} has been deleted.`);
+    const currentUser = findUser(getSession());
+    renderMembersTable(currentUser);
+  }
+
+  // Get top 10 members by points
+  function getTop10Members() {
+    const users = getUsers() || [];
+    return users
+      .filter(user => user.role === 'member') // Only include members
+      .sort((a, b) => b.points - a.points) // Sort by points in descending order
+      .slice(0, 10); // Get the top 10
+  }
+
+  // Render top 10 members table
+  function renderTop10Members() {
+    const topMembers = getTop10Members();
+    const topMembersTableBody = document.getElementById('top-members-table-body');
+    topMembersTableBody.innerHTML = topMembers
+      .map((member, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${member.name}</td>
+          <td>${member.points}</td>
+          <td>${member.ranking}</td>
+        </tr>
+      `)
+      .join('');
+  }
+
+  // Show profile section
+  function showProfile(user) {
+    profileSection.style.display = 'block';
+    profilePictureEl.src = user.profilePicture || 'default-profile.png';
+    bioInput.value = user.bio || '';
+  }
+
+  // Save profile updates
+  function saveProfile(user) {
+    const file = profilePictureInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        user.profilePicture = e.target.result; // Save the image as a base64 string
+        updateUser(user);
+        profilePictureEl.src = user.profilePicture;
+        alert('Profile picture updated successfully!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    user.bio = bioInput.value.trim();
+    updateUser(user);
+    alert('Bio updated successfully!');
+  }
+
+  // Event listener for saving profile
+  saveProfileBtn.addEventListener('click', () => {
+    const currentUser = findUser(getSession());
+    if (currentUser) {
+      saveProfile(currentUser);
+    }
+  });
+
+  // Show bio modal
+  function showBioModal(user) {
+    if (!user) {
+      alert('User not found.');
+      return;
+    }
+    bioModalName.textContent = user.name;
+    bioModalBio.textContent = user.bio || 'No bio available.';
+    bioModal.style.display = 'block';
+    bioModalOverlay.style.display = 'block';
+  }
+
+  // Hide the bio modal
+  function hideBioModal() {
+    bioModal.style.display = 'none';
+    bioModalOverlay.style.display = 'none';
+  }
+
+  // Event listener for closing the bio modal
+  closeBioModalBtn.addEventListener('click', hideBioModal);
+  bioModalOverlay.addEventListener('click', hideBioModal);
+
+  // Check for a new question and show the popup
+  function checkForQuestion() {
+    const question = localStorage.getItem(QUESTION_STORAGE_KEY);
+    if (question) {
+      popupQuestionText.textContent = question;
+      memberQuestionPopup.style.display = 'block';
+    }
+  }
+
+  // Handle member response
+  function handleMemberResponse(response) {
+    const currentUser = findUser(getSession());
+    if (!currentUser) return;
+
+    const responses = JSON.parse(localStorage.getItem(RESPONSES_STORAGE_KEY)) || { yes: [], no: [] };
+
+    // Add the member's name to the appropriate response list
+    if (response === 'Yes') {
+      if (!responses.yes.includes(currentUser.name)) {
+        responses.yes.push(currentUser.name);
+      }
+    } else if (response === 'No') {
+      if (!responses.no.includes(currentUser.name)) {
+        responses.no.push(currentUser.name);
+      }
+    }
+
+    // Save updated responses to localStorage
+    localStorage.setItem(RESPONSES_STORAGE_KEY, JSON.stringify(responses));
+
+    alert(`You answered: ${response}`);
+    memberQuestionPopup.style.display = 'none';
+
+    // Clear the question from localStorage after the response
+    localStorage.removeItem(QUESTION_STORAGE_KEY);
+  }
+
+  // Event listeners for Yes/No buttons
+  answerYesBtn.addEventListener('click', () => handleMemberResponse('Yes'));
+  answerNoBtn.addEventListener('click', () => handleMemberResponse('No'));
+
+  // Update results for admin
+  function updateAdminResults() {
+    const question = localStorage.getItem(QUESTION_STORAGE_KEY);
+    const responses = JSON.parse(localStorage.getItem(RESPONSES_STORAGE_KEY)) || { yes: [], no: [] };
+
+    if (question) {
+      resultsQuestionText.textContent = `Current Question: ${question}`;
+      resultsYesCount.textContent = responses.yes.length;
+      resultsNoCount.textContent = responses.no.length;
+
+      // Update Yes list
+      resultsYesList.innerHTML = responses.yes
+        .map(name => `<li>${name}</li>`)
+        .join('');
+
+      // Update No list
+      resultsNoList.innerHTML = responses.no
+        .map(name => `<li>${name}</li>`)
+        .join('');
+
+      adminResultsSection.style.display = 'block';
+    } else {
+      resultsQuestionText.textContent = 'No question submitted yet.';
+      resultsYesCount.textContent = '0';
+      resultsNoCount.textContent = '0';
+      resultsYesList.innerHTML = '';
+      resultsNoList.innerHTML = '';
+      adminResultsSection.style.display = 'none';
+    }
+  }
+
+  // Show dashboard and hide login
+  function showDashboard(user) {
+    loginFormEl.style.display = 'none';
+    registerFormEl.style.display = 'none';
+    dashboardEl.style.display = 'block';
+    welcomeMsg.textContent = `Welcome, ${user.name} (${user.role})`;
+
+    if (user.role === 'admin') {
+      // Admin view
+      adminQuestionSection.style.display = 'block';
+      adminResultsSection.style.display = 'block';
+      document.querySelector('table[aria-describedby="members-desc"]').style.display = 'table';
+      document.getElementById('top-members-section').style.display = 'none';
+      profileSection.style.display = 'none';
+      chatSection.style.display = 'block';
+      renderMembersTable(user);
+      updateAdminResults(); // Update results for admin
+    } else {
+      // Member view
+      adminQuestionSection.style.display = 'none';
+      adminResultsSection.style.display = 'none';
+      document.querySelector('table[aria-describedby="members-desc"]').style.display = 'none';
+      document.getElementById('top-members-section').style.display = 'block';
+      profileSection.style.display = 'block';
+      chatSection.style.display = 'block';
+      showProfile(user);
+      renderTop10Members();
+
+      // Check for a question
+      checkForQuestion();
+    }
+
+    renderChatMessages();
+  }
+
+  // Show login and hide dashboard
+  function showLogin() {
+    loginFormEl.style.display = 'block';
+    registerFormEl.style.display = 'none';
+    dashboardEl.style.display = 'none';
+    loginErrorEl.textContent = '';
+    usernameInput.value = '';
+    passwordInput.value = '';
+  }
+
+  // Show registration form and hide login
+  function showRegister() {
+    loginFormEl.style.display = 'none';
+    registerFormEl.style.display = 'block';
+    registerErrorEl.textContent = '';
+    registerNameInput.value = '';
+    registerUsernameInput.value = '';
+    registerPasswordInput.value = '';
+  }
+
+  // Login handler
+  function handleLogin() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!username || !password) {
+      loginErrorEl.textContent = 'Please enter username and password.';
+      return;
+    }
+    const users = getUsers();
+    if (!users) {
+      loginErrorEl.textContent = 'No users found - please reset app.';
+      return;
+    }
+    const user = users.find(u => u.username === username);
+    if (!user || user.password !== password) {
+      loginErrorEl.textContent = 'Invalid username or password.';
+      return;
+    }
+    // Successful login
+    saveSession(user.username);
+    showDashboard(user);
+  }
+
+  // Registration handler
+  function handleRegister() {
+    const name = registerNameInput.value.trim();
+    const username = registerUsernameInput.value.trim();
+    const password = registerPasswordInput.value;
+
+    if (!name || !username || !password) {
+      registerErrorEl.textContent = 'All fields are required.';
+      return;
+    }
+
+    const users = getUsers() || [];
+    if (users.find((u) => u.username === username)) {
+      registerErrorEl.textContent = 'Username already exists.';
+      return;
+    }
+
+    const newUser = {
+      username,
+      password,
+      name,
+      role: 'member',
+      points: 0,
+      ranking: 'Bronze',
+      profilePicture: 'default-profile.png', // Default profile picture
+      bio: '', // Default bio
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+    alert('Registration successful! You can now log in.');
+    showLogin();
+  }
+
+  // Logout handler
+  function handleLogout() {
+    clearSession();
+    showLogin();
+
+    // Sembunyikan fitur-fitur setelah logout
+    profileSection.style.display = 'none';
+    chatSection.style.display = 'none';
+    document.getElementById('top-members-section').style.display = 'none';
+    document.getElementById('admin-question-section').style.display = 'none';
+    adminResultsSection.style.display = 'none';
+  }
+
+  // Submit question
+  submitQuestionBtn.addEventListener('click', () => {
+    const question = adminQuestionInput.value.trim();
+    if (!question) {
+      alert('Please enter a question.');
+      return;
+    }
+
+    // Save the question to localStorage
+    localStorage.setItem(QUESTION_STORAGE_KEY, question);
+
+    // Clear previous responses
+    localStorage.setItem(RESPONSES_STORAGE_KEY, JSON.stringify({ yes: [], no: [] }));
+
+    // Notify members
+    alert('Question submitted successfully!');
+    adminQuestionInput.value = '';
+
+    // Update admin results section
+    updateAdminResults();
+  });
+
+  // Init flow
+  function init() {
+    initializeUsers();
+    const sessionUser = getSession();
+    if (sessionUser) {
+      const user = findUser(sessionUser);
+      if (user) {
+        showDashboard(user);
+        return;
+      } else {
+        clearSession();
+      }
+    }
+    showLogin(); // Jika tidak ada sesi, tampilkan form login
+  }
+
+  // Event listeners
+  loginBtn.addEventListener('click', handleLogin);
+  registerBtn.addEventListener('click', handleRegister);
+  logoutBtn.addEventListener('click', handleLogout);
+  showRegisterLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showRegister();
+  });
+  showLoginLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    showLogin();
+  });
+
+  // Allow pressing Enter to submit login form
+  [usernameInput, passwordInput].forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLogin();
+      }
+    });
+  });
+
+  // Allow pressing Enter to submit registration form
+  [registerNameInput, registerUsernameInput, registerPasswordInput].forEach(input => {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleRegister();
+      }
+    });
+  });
+
+  // Initialize app
+  init();
+
+})();
+</script>
+</body>
+</html>
